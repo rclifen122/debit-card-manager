@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* basic body typography tweaks */
+body { font-feature-settings: "liga" 1, "calt" 1; }
+
