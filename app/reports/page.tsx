@@ -1,21 +1,13 @@
-"use client"
+'use client'
 
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
-import Card from '@/components/ui/Card'
 import Input from '@/components/ui/Input'
-import { formatCurrency } from '@/lib/format'
 
-const ResponsiveContainer = dynamic(() => import('recharts').then(m => m.ResponsiveContainer), { ssr: false })
-const LineChart = dynamic(() => import('recharts').then(m => m.LineChart), { ssr: false })
-const Line = dynamic(() => import('recharts').then(m => m.Line), { ssr: false })
-const XAxis = dynamic(() => import('recharts').then(m => m.XAxis), { ssr: false })
-const YAxis = dynamic(() => import('recharts').then(m => m.YAxis), { ssr: false })
-const Tooltip = dynamic(() => import('recharts').then(m => m.Tooltip), { ssr: false })
-const Legend = dynamic(() => import('recharts').then(m => m.Legend), { ssr: false })
-const PieChart = dynamic(() => import('recharts').then(m => m.PieChart), { ssr: false })
-const Pie = dynamic(() => import('recharts').then(m => m.Pie), { ssr: false })
-const Cell = dynamic(() => import('recharts').then(m => m.Cell), { ssr: false })
+const Charts = dynamic(() => import('./charts'), {
+  ssr: false,
+  loading: () => <div className="text-sm text-gray-500">Loading charts...</div>
+})
 
 type Monthly = { month: string; credit: number; debit: number }
 type Item = { category: string; total: number }
@@ -55,8 +47,6 @@ export default function Page() {
   useEffect(() => { load() }, [])
   useEffect(() => { load() }, [start, end])
 
-  const totalExpense = categories.reduce((a, b) => a + Number(b.total || 0), 0)
-
   return (
     <div className="space-y-6">
       <h2 className="text-lg font-semibold">Reports</h2>
@@ -74,54 +64,7 @@ export default function Page() {
 
       {error && <div className="text-sm text-red-600">{error}</div>}
       {loading ? <div className="text-sm text-gray-500">Loading…</div> : (
-        <div className="grid gap-6 sm:grid-cols-2">
-          <Card className="p-4">
-            <h3 className="mb-3 font-medium">Monthly Summary</h3>
-            {monthly.length ? (
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={monthly}>
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip formatter={(v: any) => formatCurrency(Number(v))} />
-                    <Legend />
-                    <Line type="monotone" dataKey="credit" stroke="#16a34a" name="Income" />
-                    <Line type="monotone" dataKey="debit" stroke="#dc2626" name="Expense" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            ) : (
-              <div className="text-sm text-gray-500">No data.</div>
-            )}
-          </Card>
-
-          <Card className="p-4">
-            <h3 className="mb-3 font-medium">Expense by Category</h3>
-            {categories.length ? (
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={categories} dataKey="total" nameKey="category" outerRadius={90}>
-                      {categories.map((_, idx) => (
-                        <Cell key={idx} fill={["#60a5fa","#f472b6","#34d399","#f59e0b","#f87171","#a78bfa"][idx % 6]} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(v: any) => formatCurrency(Number(v))} />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            ) : (
-              <div className="text-sm text-gray-500">No data.</div>
-            )}
-            {!!categories.length && (
-              <div className="mt-3 flex items-center justify-between text-sm font-medium">
-                <div>Total</div>
-                <div className="text-red-700">{formatCurrency(totalExpense)}</div>
-              </div>
-            )}
-          </Card>
-        </div>
+        <Charts monthly={monthly} categories={categories} />
       )}
     </div>
   )
