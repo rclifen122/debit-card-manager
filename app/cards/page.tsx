@@ -5,6 +5,7 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import { useToast } from '@/components/ToastProvider'
+import { useTranslation } from 'react-i18next'
 
 type Card = {
   id: string
@@ -15,6 +16,7 @@ type Card = {
 }
 
 export default function Page() {
+  const { t } = useTranslation()
   const [cards, setCards] = useState<Card[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -74,68 +76,66 @@ export default function Page() {
   }
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-lg font-semibold">Cards</h2>
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-800">{t('cards')}</h2>
+      </div>
 
-      <form onSubmit={addCard} className="rounded-lg border bg-white p-4 grid gap-3 sm:grid-cols-4">
-        <div className="sm:col-span-1">
-          <label className="block text-sm text-gray-600">Last 4 Digits</label>
-          <Input required pattern="\\d{4}" value={card_number} onChange={e=>setCardNumber(e.target.value)} placeholder="1234" />
-        </div>
-        <div className="sm:col-span-1">
-          <label className="block text-sm text-gray-600">Card Name</label>
-          <Input required value={card_name} onChange={e=>setCardName(e.target.value)} placeholder="Team A" />
-        </div>
-        <div className="sm:col-span-1">
-          <label className="block text-sm text-gray-600">Department</label>
-          <Input value={department} onChange={e=>setDepartment(e.target.value)} placeholder="Sales" />
-        </div>
-        <div className="sm:col-span-1 flex items-end">
-          <Button type="submit" className="w-full">Add Card</Button>
-        </div>
-      </form>
+      <div className="bg-white rounded-xl border shadow-sm p-6">
+        <h3 className="font-semibold text-lg mb-4">{t('add_card')}</h3>
+        <form onSubmit={addCard} className="grid gap-4 sm:grid-cols-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-600">{t('last_4_digits')}</label>
+            <Input required pattern="\\d{4}" value={card_number} onChange={e=>setCardNumber(e.target.value)} placeholder="1234" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-600">{t('card_name')}</label>
+            <Input required value={card_name} onChange={e=>setCardName(e.target.value)} placeholder="Team A" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-600">{t('department')}</label>
+            <Input value={department} onChange={e=>setDepartment(e.target.value)} placeholder="Sales" />
+          </div>
+          <div className="flex items-end">
+            <Button type="submit" className="w-full">{t('add_card')}</Button>
+          </div>
+        </form>
+      </div>
 
       {error && <div className="text-sm text-red-600">{error}</div>}
-      {loading ? <div className="text-sm text-gray-500">Loading…</div> : (
-        <div className="rounded-lg border bg-white overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-gray-500">
-                <th className="py-2 px-3">Name</th>
-                <th className="py-2 px-3">Department</th>
-                <th className="py-2 px-3">Card</th>
-                <th className="py-2 px-3">Balance</th>
-                <th className="py-2 px-3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {cards.map(c => (
-                <tr key={c.id} className="border-t">
-                  <td className="py-2 px-3">{c.card_name}</td>
-                  <td className="py-2 px-3">{c.department || '—'}</td>
-                  <td className="py-2 px-3">•••• {c.card_number}</td>
-                  <td className="py-2 px-3">{Number(c.current_balance || 0).toLocaleString(undefined, { style: 'currency', currency: 'USD' })}</td>
-                  <td className="py-2 px-3 text-right">
-                    <Button variant="danger" onClick={()=>setConfirmId(c.id)}>Delete</Button>
-                  </td>
-                </tr>
-              ))}
-              {!cards.length && (
-                <tr><td className="py-3 px-3 text-gray-500" colSpan={5}>No cards created yet.</td></tr>
-              )}
-            </tbody>
-          </table>
+      {loading ? <div className="text-center text-gray-500 py-10">{t('loading')}</div> : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {cards.map(c => (
+            <div key={c.id} className="bg-white rounded-xl shadow-sm border p-5 transition-all hover:shadow-md">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="font-bold text-lg text-gray-800">{c.card_name}</p>
+                  <p className="text-sm text-gray-500">{c.department || '—'}</p>
+                </div>
+                <Button variant="danger" size="sm" onClick={() => setConfirmId(c.id)}>{t('delete')}</Button>
+              </div>
+              <div className="mt-4 flex justify-between items-baseline">
+                <p className="text-sm text-gray-600 font-mono">•••• {c.card_number}</p>
+                <p className="text-xl font-semibold text-gray-800">
+                  {Number(c.current_balance || 0).toLocaleString(undefined, { style: 'currency', currency: 'USD' })}
+                </p>
+              </div>
+            </div>
+          ))}
+          {!cards.length && (
+            <div className="md:col-span-2 lg:col-span-3 text-center text-gray-500 py-10">
+              {t('no_cards_created_yet')}
+            </div>
+          )}
         </div>
       )}
       <ConfirmDialog
         open={!!confirmId}
-        title="Delete card"
-        message="This will remove the card and its transactions. Proceed?"
+        title={t('delete_card')}
+        message={t('delete_card_confirmation')}
         onCancel={() => setConfirmId(null)}
         onConfirm={() => { if (confirmId) deleteCardConfirmed(confirmId); setConfirmId(null) }}
       />
     </div>
   )
 }
-
-// Confirm dialog mount
