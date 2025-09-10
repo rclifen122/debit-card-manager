@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 
 type Tx = {
@@ -21,6 +21,16 @@ export default function Page() {
   const [transactions, setTransactions] = useState<Tx[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const recentTotalAmount = useMemo(() => {
+    return transactions.reduce((acc, tx) => {
+      if (tx.type === 'credit') {
+        return acc + Number(tx.amount);
+      } else {
+        return acc - Number(tx.amount);
+      }
+    }, 0);
+  }, [transactions]);
 
   async function load() {
     setLoading(true); setError(null)
@@ -84,9 +94,9 @@ export default function Page() {
         </div>
         {error && <div className="px-6 pb-6 text-sm text-red-600">{error}</div>}
         {loading ? <div className="px-6 pb-6 text-sm text-gray-500">{t('loading')}</div> : (
-          <div className="overflow-x-auto">
+          <div className="overflow-auto max-h-[400px]">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50">
+              <thead className="sticky top-0 bg-gray-50 z-10">
                 <tr className="text-left text-gray-600 font-medium">
                   <th className="py-3 px-6">{t('date')}</th>
                   <th className="py-3 px-6">{t('type')}</th>
@@ -115,6 +125,17 @@ export default function Page() {
                   <tr><td className="py-6 px-6 text-center text-gray-500" colSpan={7}>{t('no_transactions_yet')}</td></tr>
                 )}
               </tbody>
+              {transactions.length > 0 && (
+                <tfoot className="sticky bottom-0 bg-gray-100 font-semibold">
+                  <tr>
+                    <td colSpan={2} className="py-2 px-6 text-right">{t('total')}</td>
+                    <td className={`py-2 px-6 ${recentTotalAmount < 0 ? 'text-red-600' : 'text-green-700'}`}>
+                      {recentTotalAmount.toLocaleString(undefined, { style: 'currency', currency: 'USD' })}
+                    </td>
+                    <td colSpan={4}></td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </div>
         )}
