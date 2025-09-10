@@ -4,23 +4,27 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import en from '@/locales/en/common.json';
 import vi from '@/locales/vi/common.json';
 
-i18n
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    debug: process.env.NODE_ENV === 'development',
-    fallbackLng: 'en',
-    interpolation: {
-      escapeValue: false, // not needed for react as it escapes by default
+const i18nSetup = i18n.use(initReactI18next);
+
+// only use language detector in browser
+if (typeof window !== 'undefined') {
+  i18nSetup.use(LanguageDetector);
+}
+
+i18nSetup.init({
+  debug: process.env.NODE_ENV === 'development',
+  fallbackLng: 'en',
+  interpolation: {
+    escapeValue: false, // not needed for react as it escapes by default
+  },
+  resources: {
+    en: {
+      translation: en,
     },
-    resources: {
-      en: {
-        translation: en,
-      },
-      vi: {
-        translation: vi,
-      },
+    vi: {
+      translation: vi,
     },
-  });
+  },
+});
 
 export default i18n;
