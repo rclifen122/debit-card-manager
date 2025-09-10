@@ -86,7 +86,7 @@ export default function Page() {
         <form onSubmit={addCard} className="grid gap-4 sm:grid-cols-4">
           <div>
             <label className="block text-sm font-medium text-gray-600">{t('last_4_digits')}</label>
-            <Input required pattern="\\d{4}" value={card_number} onChange={e=>setCardNumber(e.target.value)} placeholder="1234" />
+            <Input required pattern="[0-9]{4}" value={card_number} onChange={e=>setCardNumber(e.target.value)} placeholder="1234" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-600">{t('card_name')}</label>
