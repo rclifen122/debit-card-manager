@@ -362,6 +362,21 @@ export default function Page() {
                 </Button>
               </div>
             </div>
+            <div className="flex items-center justify-end gap-2 p-3 border-t">
+              <div className="w-40">
+                <label className="block text-sm text-gray-600">{t('format')}</label>
+                <Select value={exportFormat} onChange={e => setExportFormat((e.target as HTMLSelectElement).value as any)}>
+                  <option value="xlsx">{t('excel')}</option>
+                  <option value="csv">{t('csv')}</option>
+                  <option value="pdf">{t('pdf')}</option>
+                </Select>
+              </div>
+              <div className="pt-5">
+                <Button type="button" variant="secondary" disabled={exporting} onClick={exportTransactions}>
+                  {t('export')}
+                </Button>
+              </div>
+            </div>
           </>
         )}
       </div>

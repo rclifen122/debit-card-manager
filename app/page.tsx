@@ -21,6 +21,8 @@ export default function Page() {
   const [transactions, setTransactions] = useState<Tx[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [exportFormat, setExportFormat] = useState<'csv' | 'xlsx' | 'pdf'>('xlsx')
+  const [exporting, setExporting] = useState(false)
 
   const recentTotalAmount = useMemo(() => {
     return transactions.reduce((acc, tx) => {
@@ -56,6 +58,32 @@ export default function Page() {
   useEffect(() => {
     load()
   }, [])
+
+  async function exportRecent() {
+    try {
+      setExporting(true)
+      const params = new URLSearchParams()
+      params.set('limit', '10')
+      params.set('format', exportFormat)
+      const url = `/api/transactions/export?${params.toString()}`
+      const res = await fetch(url)
+      if (!res.ok) throw new Error(await res.text())
+      const blob = await res.blob()
+      const a = document.createElement('a')
+      const cd = res.headers.get('content-disposition') || ''
+      const match = /filename="?([^";]+)"?/i.exec(cd)
+      const ts = new Date().toISOString().replace(/[:T]/g, '-').slice(0, 19)
+      a.href = URL.createObjectURL(blob)
+      a.download = match ? match[1] : `recent-transactions-${ts}.${exportFormat === 'xlsx' ? 'xlsx' : exportFormat}`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+    } catch (e: any) {
+      setError(e.message || t('export_failed'))
+    } finally {
+      setExporting(false)
+    }
+  }
 
   return (
     <div className="space-y-8">
@@ -115,9 +143,30 @@ export default function Page() {
       <section className="rounded-xl border bg-white shadow-sm">
         <div className="p-6 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-800">{t('recent_transactions')}</h2>
-          <button onClick={load} className="text-sm font-medium text-blue-600 hover:underline">
-            {t('refresh')}
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={load} className="text-sm font-medium text-blue-600 hover:underline">
+              {t('refresh')}
+            </button>
+            <div className="flex items-center gap-2">
+              <select
+                className="border rounded px-2 py-1 text-sm"
+                value={exportFormat}
+                onChange={e => setExportFormat(e.target.value as any)}
+              >
+                <option value="xlsx">{t('excel')}</option>
+                <option value="csv">{t('csv')}</option>
+                <option value="pdf">{t('pdf')}</option>
+              </select>
+              <button
+                className="text-sm font-medium text-gray-700 border rounded px-3 py-1 hover:bg-gray-50 disabled:opacity-50"
+                disabled={exporting}
+                onClick={exportRecent}
+                type="button"
+              >
+                {t('export')}
+              </button>
+            </div>
+          </div>
         </div>
         {error && <div className="px-6 pb-6 text-sm text-red-600">{error}</div>}
         {loading ? (
@@ -181,4 +230,3 @@ export default function Page() {
     </div>
   )
 }
-

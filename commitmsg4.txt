@@ -1,0 +1,1 @@
+fix(pdf): return ArrayBuffer to Response instead of Blob to satisfy BodyInit and BlobPart types in Vercel TS build

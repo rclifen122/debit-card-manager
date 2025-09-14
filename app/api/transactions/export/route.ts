@@ -32,6 +32,8 @@ export async function GET(req: NextRequest) {
   const end = searchParams.get('end')
   const q = searchParams.get('q')
   const format = (searchParams.get('format') || 'csv').toLowerCase()
+  const limitParam = searchParams.get('limit')
+  const offsetParam = searchParams.get('offset')
 
   let query = supabase
     .from('transactions')
@@ -49,9 +51,15 @@ export async function GET(req: NextRequest) {
     )
   }
 
-  // Export up to a generous cap to avoid huge responses
+  // Apply range if provided; otherwise export up to a generous cap
   // Supabase range is inclusive
-  query = query.range(0, 49999)
+  const limitNum = limitParam ? Math.max(1, Math.min(50000, parseInt(limitParam, 10) || 0)) : null
+  const offsetNum = offsetParam ? Math.max(0, parseInt(offsetParam, 10) || 0) : 0
+  if (limitNum) {
+    query = query.range(offsetNum, offsetNum + limitNum - 1)
+  } else {
+    query = query.range(0, 49999)
+  }
 
   const { data, error } = await query
   if (error) {
