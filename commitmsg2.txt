@@ -1,0 +1,1 @@
+fix(exports): use ArrayBuffer for XLSX responses to satisfy Web Response BodyInit types

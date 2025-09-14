@@ -139,7 +139,7 @@ export async function GET(req: NextRequest) {
       page.drawText('No data.', { x: margin, y: page.getHeight() - margin, size: 12, font })
     }
     const pdfBytes = await pdfDoc.save()
-    return new Response(pdfBytes, {
+    return new Response(new Blob([pdfBytes], { type: 'application/pdf' }), {
       status: 200,
       headers: {
         'content-type': 'application/pdf',
