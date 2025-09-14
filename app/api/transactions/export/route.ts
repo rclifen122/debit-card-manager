@@ -164,7 +164,8 @@ export async function GET(req: NextRequest) {
     }
 
     const pdfBytes = await pdfDoc.save()
-    return new Response(new Blob([pdfBytes], { type: 'application/pdf' }), {
+    const ab = pdfBytes.buffer.slice(pdfBytes.byteOffset, pdfBytes.byteOffset + pdfBytes.byteLength) as ArrayBuffer
+    return new Response(ab, {
       status: 200,
       headers: {
         'content-type': 'application/pdf',
