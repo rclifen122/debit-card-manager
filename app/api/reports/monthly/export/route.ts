@@ -84,8 +84,8 @@ export async function GET(req: NextRequest) {
     const aoa = [headers, ...rows]
     const ws = XLSX.utils.aoa_to_sheet(aoa)
     XLSX.utils.book_append_sheet(wb, ws, 'Monthly')
-    const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' }) as Buffer
-    return new Response(buf, {
+    const buf = XLSX.write(wb, { type: 'array', bookType: 'xlsx' }) as ArrayBuffer
+    return new Response(new Uint8Array(buf), {
       status: 200,
       headers: {
         'content-type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

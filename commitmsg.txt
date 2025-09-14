@@ -1,0 +1,1 @@
+feat(exports): CSV/XLSX/PDF exports with chart snapshots and contextual filenames; VI locale fix; UI fallbacks cleanup; README; export check script
