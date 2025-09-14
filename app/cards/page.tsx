@@ -29,7 +29,8 @@ export default function Page() {
   const { addToast } = useToast()
 
   async function load() {
-    setLoading(true); setError(null)
+    setLoading(true)
+    setError(null)
     try {
       const res = await fetch('/api/cards', { cache: 'no-store' })
       const json = await res.json()
@@ -42,7 +43,9 @@ export default function Page() {
     }
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    load()
+  }, [])
 
   async function addCard(e: React.FormEvent) {
     e.preventDefault()
@@ -55,7 +58,9 @@ export default function Page() {
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Failed to add')
-      setCardNumber(''); setCardName(''); setDepartment('')
+      setCardNumber('')
+      setCardName('')
+      setDepartment('')
       addToast({ title: 'Card created', description: `${json.data.card_name} (•••• ${json.data.card_number})`, variant: 'success' })
       await load()
     } catch (e: any) {
@@ -86,15 +91,15 @@ export default function Page() {
         <form onSubmit={addCard} className="grid gap-4 sm:grid-cols-4">
           <div>
             <label className="block text-sm font-medium text-gray-600">{t('last_4_digits')}</label>
-            <Input required pattern="[0-9]{4}" value={card_number} onChange={e=>setCardNumber(e.target.value)} placeholder="1234" />
+            <Input required pattern="[0-9]{4}" value={card_number} onChange={e => setCardNumber(e.target.value)} placeholder="1234" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-600">{t('card_name')}</label>
-            <Input required value={card_name} onChange={e=>setCardName(e.target.value)} placeholder="Team A" />
+            <Input required value={card_name} onChange={e => setCardName(e.target.value)} placeholder="Team A" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-600">{t('department')}</label>
-            <Input value={department} onChange={e=>setDepartment(e.target.value)} placeholder="Sales" />
+            <Input value={department} onChange={e => setDepartment(e.target.value)} placeholder="Sales" />
           </div>
           <div className="flex items-end">
             <Button type="submit" className="w-full">{t('add_card')}</Button>
@@ -103,14 +108,16 @@ export default function Page() {
       </div>
 
       {error && <div className="text-sm text-red-600">{error}</div>}
-      {loading ? <div className="text-center text-gray-500 py-10">{t('loading')}</div> : (
+      {loading ? (
+        <div className="text-center text-gray-500 py-10">{t('loading')}</div>
+      ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {cards.map(c => (
             <div key={c.id} className="bg-white rounded-xl shadow-sm border p-5 transition-all hover:shadow-md">
               <div className="flex justify-between items-start">
                 <div>
                   <p className="font-bold text-lg text-gray-800">{c.card_name}</p>
-                  <p className="text-sm text-gray-500">{c.department || '—'}</p>
+                  <p className="text-sm text-gray-500">{c.department || t('na')}</p>
                 </div>
                 <Button variant="danger" size="sm" onClick={() => setConfirmId(c.id)}>{t('delete')}</Button>
               </div>
@@ -134,8 +141,12 @@ export default function Page() {
         title={t('delete_card')}
         message={t('delete_card_confirmation')}
         onCancel={() => setConfirmId(null)}
-        onConfirm={() => { if (confirmId) deleteCardConfirmed(confirmId); setConfirmId(null) }}
+        onConfirm={() => {
+          if (confirmId) deleteCardConfirmed(confirmId)
+          setConfirmId(null)
+        }}
       />
     </div>
   )
 }
+

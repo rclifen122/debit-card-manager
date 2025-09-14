@@ -48,5 +48,12 @@
   "next": "Next",
   "transaction_added": "Transaction added",
   "failed_to_create": "Failed to create",
-  "total": "Total"
+  "total": "Total",
+  "export": "Export",
+  "format": "Format",
+  "excel": "Excel",
+  "csv": "CSV",
+  "pdf": "PDF",
+  "export_failed": "Export failed",
+  "na": "N/A"
 }

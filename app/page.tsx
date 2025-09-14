@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next'
 
 type Tx = {
   id: string
@@ -16,7 +16,7 @@ type Tx = {
 }
 
 export default function Page() {
-  const { t } = useTranslation();
+  const { t } = useTranslation()
   const [total, setTotal] = useState<number | null>(null)
   const [transactions, setTransactions] = useState<Tx[]>([])
   const [loading, setLoading] = useState(true)
@@ -25,15 +25,16 @@ export default function Page() {
   const recentTotalAmount = useMemo(() => {
     return transactions.reduce((acc, tx) => {
       if (tx.type === 'credit') {
-        return acc + Number(tx.amount);
+        return acc + Number(tx.amount)
       } else {
-        return acc - Number(tx.amount);
+        return acc - Number(tx.amount)
       }
-    }, 0);
-  }, [transactions]);
+    }, 0)
+  }, [transactions])
 
   async function load() {
-    setLoading(true); setError(null)
+    setLoading(true)
+    setError(null)
     try {
       const [balRes, txRes] = await Promise.all([
         fetch('/api/reports/balance', { cache: 'no-store' }),
@@ -52,7 +53,9 @@ export default function Page() {
     }
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    load()
+  }, [])
 
   return (
     <div className="space-y-8">
@@ -60,13 +63,24 @@ export default function Page() {
         <div className="rounded-xl border bg-white p-6 shadow-sm">
           <div className="text-sm font-medium text-gray-500">{t('total_balance')}</div>
           <div className="mt-2 text-3xl font-bold text-gray-800">
-            {loading ? '—' : total?.toLocaleString(undefined, { style: 'currency', currency: 'USD' })}
+            {loading ? t('loading') : total?.toLocaleString(undefined, { style: 'currency', currency: 'USD' })}
           </div>
         </div>
-        <a href="/transactions" className="group rounded-xl border bg-white p-6 hover:border-blue-500 hover:shadow-lg transition-all duration-300">
+        <a
+          href="/transactions"
+          className="group rounded-xl border bg-white p-6 hover:border-blue-500 hover:shadow-lg transition-all duration-300"
+        >
           <div className="flex items-center gap-4">
             <div className="bg-blue-100 text-blue-600 p-3 rounded-full">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
             </div>
             <div>
               <div className="text-sm text-gray-500">{t('quick_action')}</div>
@@ -74,10 +88,21 @@ export default function Page() {
             </div>
           </div>
         </a>
-        <a href="/transactions" className="group rounded-xl border bg-white p-6 hover:border-red-500 hover:shadow-lg transition-all duration-300">
+        <a
+          href="/transactions"
+          className="group rounded-xl border bg-white p-6 hover:border-red-500 hover:shadow-lg transition-all duration-300"
+        >
           <div className="flex items-center gap-4">
             <div className="bg-red-100 text-red-600 p-3 rounded-full">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 12H6" /></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 12H6" />
+              </svg>
             </div>
             <div>
               <div className="text-sm text-gray-500">{t('quick_action')}</div>
@@ -90,10 +115,14 @@ export default function Page() {
       <section className="rounded-xl border bg-white shadow-sm">
         <div className="p-6 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-800">{t('recent_transactions')}</h2>
-          <button onClick={load} className="text-sm font-medium text-blue-600 hover:underline">{t('refresh')}</button>
+          <button onClick={load} className="text-sm font-medium text-blue-600 hover:underline">
+            {t('refresh')}
+          </button>
         </div>
         {error && <div className="px-6 pb-6 text-sm text-red-600">{error}</div>}
-        {loading ? <div className="px-6 pb-6 text-sm text-gray-500">{t('loading')}</div> : (
+        {loading ? (
+          <div className="px-6 pb-6 text-sm text-gray-500">{t('loading')}</div>
+        ) : (
           <div className="overflow-auto max-h-[400px]">
             <table className="w-full text-sm">
               <thead className="sticky top-0 bg-gray-50 z-10">
@@ -108,27 +137,36 @@ export default function Page() {
                 </tr>
               </thead>
               <tbody>
-                {transactions.map((t, index) => (
-                  <tr key={t.id} className={`border-t ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                    <td className="py-4 px-6 text-gray-700">{new Date(t.transaction_date).toLocaleString()}</td>
-                    <td className="py-4 px-6 capitalize">{t.type}</td>
-                    <td className={`py-4 px-6 font-medium ${t.type === 'debit' ? 'text-red-600' : 'text-green-600'}`}>
-                      {(t.type === 'debit' ? -t.amount : t.amount).toLocaleString(undefined, { style: 'currency', currency: 'USD' })}
+                {transactions.map((tx, index) => (
+                  <tr key={tx.id} className={`border-t ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                    <td className="py-4 px-6 text-gray-700">{new Date(tx.transaction_date).toLocaleString()}</td>
+                    <td className="py-4 px-6 capitalize">{tx.type}</td>
+                    <td className={`py-4 px-6 font-medium ${tx.type === 'debit' ? 'text-red-600' : 'text-green-600'}`}>
+                      {(tx.type === 'debit' ? -tx.amount : tx.amount).toLocaleString(undefined, {
+                        style: 'currency',
+                        currency: 'USD',
+                      })}
                     </td>
-                    <td className="py-4 px-6 text-gray-700">{t.category || '—'}</td>
-                    <td className="py-4 px-6 text-gray-700">{t.vendor_name || '—'}</td>
-                    <td className="py-4 px-6 text-gray-700">{t.client_partner_name || '—'}</td>
-                    <td className="py-4 px-6 text-gray-700">{t.description || '—'}</td>
+                    <td className="py-4 px-6 text-gray-700">{tx.category || t('na')}</td>
+                    <td className="py-4 px-6 text-gray-700">{tx.vendor_name || t('na')}</td>
+                    <td className="py-4 px-6 text-gray-700">{tx.client_partner_name || t('na')}</td>
+                    <td className="py-4 px-6 text-gray-700">{tx.description || t('na')}</td>
                   </tr>
                 ))}
                 {!transactions.length && (
-                  <tr><td className="py-6 px-6 text-center text-gray-500" colSpan={7}>{t('no_transactions_yet')}</td></tr>
+                  <tr>
+                    <td className="py-6 px-6 text-center text-gray-500" colSpan={7}>
+                      {t('no_transactions_yet')}
+                    </td>
+                  </tr>
                 )}
               </tbody>
               {transactions.length > 0 && (
                 <tfoot className="sticky bottom-0 bg-gray-100 font-semibold">
                   <tr>
-                    <td colSpan={2} className="py-2 px-6 text-right">{t('total')}</td>
+                    <td colSpan={2} className="py-2 px-6 text-right">
+                      {t('total')}
+                    </td>
                     <td className={`py-2 px-6 ${recentTotalAmount < 0 ? 'text-red-600' : 'text-green-700'}`}>
                       {recentTotalAmount.toLocaleString(undefined, { style: 'currency', currency: 'USD' })}
                     </td>
