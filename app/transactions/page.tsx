@@ -1,11 +1,11 @@
 "use client"
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useCallback } from 'react'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import { useToast } from '@/components/ToastProvider'
-import { useTranslation } from 'react-i18next'
+import ConfirmDialog from '@/components/ui/ConfirmDialog'
 
 type Card = { id: string; card_name: string; card_number: string }
 type Tx = {
@@ -65,11 +65,11 @@ export default function Page() {
     setForm(prev => ({ ...prev, [k]: v }))
   }
 
-  async function loadCards() {
+  const loadCards = useCallback(async () => {
     const res = await fetch('/api/cards', { cache: 'no-store' })
     const json = await res.json()
     if (res.ok) setCards(json.data || [])
-  }
+  }, [])
 
   const query = useMemo(() => {
     const params = new URLSearchParams()
@@ -83,7 +83,7 @@ export default function Page() {
     return params.toString()
   }, [type, cardId, q, start, end, limit, offset])
 
-  async function loadTransactions() {
+  const loadTransactions = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
@@ -97,14 +97,14 @@ export default function Page() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [query])
 
   useEffect(() => {
     loadCards()
-  }, [])
+  }, [loadCards])
   useEffect(() => {
     loadTransactions()
-  }, [query])
+  }, [loadTransactions])
 
   async function exportTransactions() {
     try {
@@ -179,8 +179,31 @@ export default function Page() {
     }
   }
 
+  const [confirmId, setConfirmId] = useState<string | null>(null)
+
+  async function deleteTransactionConfirmed(id: string) {
+    const res = await fetch(`/api/transactions/${id}`, { method: 'DELETE' })
+    if (res.ok) {
+      addToast({ title: t('transaction_deleted'), variant: 'success' })
+      loadTransactions()
+    } else {
+      const json = await res.json().catch(() => ({}))
+      addToast({ title: t('error'), description: json.error || t('failed_to_delete'), variant: 'error' })
+    }
+  }
+
   return (
     <div className="space-y-6">
+      <ConfirmDialog
+        open={!!confirmId}
+        title={t('delete_transaction')}
+        message={t('delete_transaction_confirmation')}
+        onCancel={() => setConfirmId(null)}
+        onConfirm={() => {
+          if (confirmId) deleteTransactionConfirmed(confirmId)
+          setConfirmId(null)
+        }}
+      />
       <h2 className="text-lg font-semibold">{t('transactions')}</h2>
 
       <form onSubmit={addTransaction} className="rounded-lg border bg-white p-4 grid gap-3 sm:grid-cols-6">
@@ -201,7 +224,7 @@ export default function Page() {
             <option value="">{t('select_card')}</option>
             {cards.map(c => (
               <option key={c.id} value={c.id}>
-                {c.card_name} (•••• {c.card_number})
+                {c.card_name} ({c.card_number})
               </option>
             ))}
           </Select>
@@ -250,7 +273,7 @@ export default function Page() {
             <option value="">{t('all_cards')}</option>
             {cards.map(c => (
               <option key={c.id} value={c.id}>
-                {c.card_name} (•••• {c.card_number})
+                {c.card_name} ({c.card_number})
               </option>
             ))}
           </Select>
@@ -300,6 +323,7 @@ export default function Page() {
                   <th className="py-2 px-3">{t('vendor')}</th>
                   <th className="py-2 px-3">{t('client_partner')}</th>
                   <th className="py-2 px-3">{t('description')}</th>
+                  <th className="py-2 px-3"></th>
                 </tr>
               </thead>
               <tbody>
@@ -317,11 +341,14 @@ export default function Page() {
                     <td className="py-2 px-3">{tx.vendor_name || t('na')}</td>
                     <td className="py-2 px-3">{tx.client_partner_name || t('na')}</td>
                     <td className="py-2 px-3">{tx.description || t('na')}</td>
+                    <td className="py-2 px-3">
+                      <Button variant="danger" size="sm" onClick={() => setConfirmId(tx.id)}>{t('delete')}</Button>
+                    </td>
                   </tr>
                 ))}
                 {!transactions.length && (
                   <tr>
-                    <td className="py-3 px-3 text-gray-500" colSpan={7}>
+                    <td className="py-3 px-3 text-gray-500" colSpan={8}>
                       {t('no_transactions_found')}
                     </td>
                   </tr>
@@ -336,7 +363,7 @@ export default function Page() {
                     <td className={`py-2 px-3 ${totalAmount < 0 ? 'text-red-600' : 'text-green-700'}`}>
                       {totalAmount.toLocaleString(undefined, { style: 'currency', currency: 'USD' })}
                     </td>
-                    <td colSpan={4}></td>
+                    <td colSpan={5}></td>
                   </tr>
                 </tfoot>
               )}

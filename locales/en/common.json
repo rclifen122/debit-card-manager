@@ -19,7 +19,7 @@
   "client_partner": "Client/Partner",
   "description": "Description",
   "no_transactions_yet": "No transactions yet.",
-  "last_4_digits": "Last 4 Digits",
+  "card_number": "Card Number",
   "card_name": "Card Name",
   "department": "Department",
   "add_card": "Add Card",
@@ -55,5 +55,9 @@
   "csv": "CSV",
   "pdf": "PDF",
   "export_failed": "Export failed",
-  "na": "N/A"
+  "na": "N/A",
+  "transaction_deleted": "Transaction deleted",
+  "failed_to_delete": "Failed to delete",
+  "delete_transaction": "Delete transaction",
+  "delete_transaction_confirmation": "This will permanently delete the transaction. Proceed?"
 }

@@ -20,8 +20,8 @@ export async function POST(req: Request) {
   const card_name = String(body.card_name ?? '').trim()
   const department = body.department ? String(body.department).trim() : null
 
-  if (!/^[0-9]{4}$/.test(card_number)) {
-    return NextResponse.json({ error: 'card_number must be exactly 4 digits' }, { status: 400 })
+  if (!/^[0-9]+$/.test(card_number)) {
+    return NextResponse.json({ error: 'card_number must be a string of digits' }, { status: 400 })
   }
   if (!card_name) {
     return NextResponse.json({ error: 'card_name is required' }, { status: 400 })

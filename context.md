@@ -31,7 +31,7 @@ This file captures the current status and working context for the Debit Card Man
 
 ## Data Model (db/schema.sql)
 - tables:
-  - `cards` (id, card_number last4, card_name, department, current_balance, timestamps)
+  - `cards` (id, card_number, card_name, department, current_balance, timestamps)
   - `transactions` (id, card_id, type credit|debit, amount, description, category, vendor_name, client_partner_name, transaction_date, created_by, timestamps)
   - `balance_snapshots` (id, card_id, balance, snapshot_date, timestamps)
 - triggers maintain `cards.current_balance` on tx insert/update/delete.
@@ -40,7 +40,7 @@ This file captures the current status and working context for the Debit Card Man
 ## API Endpoints
 - Cards
   - `GET /api/cards`
-  - `POST /api/cards` (validate last4, name)
+  - `POST /api/cards` (validate name)
   - `PUT /api/cards/[id]`
   - `DELETE /api/cards/[id]`
 - Transactions
@@ -65,7 +65,7 @@ This file captures the current status and working context for the Debit Card Man
   - Shows total balance, quick actions, and recent 10 transactions
   - Export controls for recent transactions (CSV/XLSX/PDF via `/api/transactions/export?limit=10`)
 - `/cards` Cards
-  - Create/list/delete cards; masked display `•••• 1234`
+  - Create/list/delete cards
 - `/transactions` Transactions
   - Create new tx
   - Filter/search/paginate list
@@ -84,7 +84,7 @@ This file captures the current status and working context for the Debit Card Man
 - CSV: server builds UTF-8 text with escaped cells
 - Excel: `xlsx` AOAs -> sheet -> workbook; writes as ArrayBuffer; Response sends `Uint8Array(ArrayBuffer)`
 - PDF: `pdf-lib` creates simple tables; Reports exports embed basic bar charts
-- Filenames: Content-Disposition with contextual suffix (type, date range, card name+last4, search)
+- Filenames: Content-Disposition with contextual suffix (type, date range, card name+number, search)
 - Transactions export supports client-provided `limit`/`offset` to export the current slice (used by Dashboard recent)
 
 ## Known/Recent Fixes
@@ -95,7 +95,7 @@ This file captures the current status and working context for the Debit Card Man
 
 ## Future Ideas / Backlog
 - Optional: richer PDF formatting (pagination headers, totals, currency, localization)
-- Optional: include card name/last4 directly in Transactions table view and export the same order
+- Optional: include card name/number directly in Transactions table view and export the same order
 - Optional: auth/rate-limiting if project becomes public
 - Optional: CSV import for bulk transactions
 - Optional: tests for API endpoints

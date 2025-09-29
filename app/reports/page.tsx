@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
@@ -25,7 +25,7 @@ export default function Page() {
   const [format, setFormat] = useState<'csv' | 'xlsx' | 'pdf'>('xlsx')
   const [exporting, setExporting] = useState(false)
 
-  async function load() {
+  const load = useCallback(async () => {
     setLoading(true); setError(null)
     try {
       const qs = new URLSearchParams()
@@ -46,10 +46,9 @@ export default function Page() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [start, end])
 
-  useEffect(() => { load() }, [])
-  useEffect(() => { load() }, [start, end])
+  useEffect(() => { load() }, [load])
 
   async function triggerDownload(url: string, fallbackName: string) {
     const res = await fetch(url)

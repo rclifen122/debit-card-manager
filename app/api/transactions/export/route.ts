@@ -68,7 +68,7 @@ export async function GET(req: NextRequest) {
 
   const rows = (data as any[] | null) || []
   const headers = [
-    'Date', 'Type', 'Amount', 'Category', 'Vendor', 'Client/Partner', 'Description', 'Card Name', 'Card Last4', 'Card ID'
+    'Date', 'Type', 'Amount', 'Category', 'Vendor', 'Client/Partner', 'Description', 'Card Name', 'Card Number', 'Card ID'
   ]
   const mapped = rows.map(r => [
     fmtDate(r.transaction_date),

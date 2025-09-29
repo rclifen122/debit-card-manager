@@ -19,7 +19,7 @@
   "client_partner": "Khách hàng/Đối tác",
   "description": "Mô tả",
   "no_transactions_yet": "Chưa có giao dịch nào.",
-  "last_4_digits": "4 số cuối",
+  "card_number": "Số thẻ",
   "card_name": "Tên thẻ",
   "department": "Phòng ban",
   "add_card": "Thêm thẻ",
@@ -55,5 +55,9 @@
   "csv": "CSV",
   "pdf": "PDF",
   "export_failed": "Xuất thất bại",
-  "na": "Không có"
+  "na": "Không có",
+  "transaction_deleted": "Đã xóa giao dịch",
+  "failed_to_delete": "Không thể xóa",
+  "delete_transaction": "Xóa giao dịch",
+  "delete_transaction_confirmation": "Thao tác này sẽ xóa vĩnh viễn giao dịch. Tiếp tục?"
 }

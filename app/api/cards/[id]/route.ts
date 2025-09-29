@@ -15,7 +15,7 @@ export async function PUT(req: Request, { params }: Params) {
   if (body.department !== undefined) updates.department = body.department ? String(body.department).trim().slice(0, 255) : null
   if (body.card_number !== undefined) {
     const cn = String(body.card_number)
-    if (!/^[0-9]{4}$/.test(cn)) return NextResponse.json({ error: 'card_number must be 4 digits' }, { status: 400 })
+    if (!/^[0-9]+$/.test(cn)) return NextResponse.json({ error: 'card_number must be a string of digits' }, { status: 400 })
     updates.card_number = cn
   }
 

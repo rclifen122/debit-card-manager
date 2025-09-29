@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
@@ -28,7 +28,7 @@ export default function Page() {
   const [confirmId, setConfirmId] = useState<string | null>(null)
   const { addToast } = useToast()
 
-  async function load() {
+  const load = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
@@ -41,11 +41,11 @@ export default function Page() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     load()
-  }, [])
+  }, [load])
 
   async function addCard(e: React.FormEvent) {
     e.preventDefault()
@@ -61,7 +61,7 @@ export default function Page() {
       setCardNumber('')
       setCardName('')
       setDepartment('')
-      addToast({ title: 'Card created', description: `${json.data.card_name} (•••• ${json.data.card_number})`, variant: 'success' })
+      addToast({ title: 'Card created', description: `${json.data.card_name} (${json.data.card_number})`, variant: 'success' })
       await load()
     } catch (e: any) {
       setError(e.message || 'Failed to add')
@@ -90,8 +90,8 @@ export default function Page() {
         <h3 className="font-semibold text-lg mb-4">{t('add_card')}</h3>
         <form onSubmit={addCard} className="grid gap-4 sm:grid-cols-4">
           <div>
-            <label className="block text-sm font-medium text-gray-600">{t('last_4_digits')}</label>
-            <Input required pattern="[0-9]{4}" value={card_number} onChange={e => setCardNumber(e.target.value)} placeholder="1234" />
+            <label className="block text-sm font-medium text-gray-600">{t('card_number')}</label>
+            <Input required value={card_number} onChange={e => setCardNumber(e.target.value)} placeholder="1234" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-600">{t('card_name')}</label>
@@ -122,7 +122,7 @@ export default function Page() {
                 <Button variant="danger" size="sm" onClick={() => setConfirmId(c.id)}>{t('delete')}</Button>
               </div>
               <div className="mt-4 flex justify-between items-baseline">
-                <p className="text-sm text-gray-600 font-mono">•••• {c.card_number}</p>
+                <p className="text-sm text-gray-600 font-mono">{c.card_number}</p>
                 <p className="text-xl font-semibold text-gray-800">
                   {Number(c.current_balance || 0).toLocaleString(undefined, { style: 'currency', currency: 'USD' })}
                 </p>

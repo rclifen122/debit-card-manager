@@ -9,7 +9,7 @@ exception when duplicate_object then null; end $$;
 -- Cards table
 create table if not exists public.cards (
   id uuid primary key default gen_random_uuid(),
-  card_number varchar(4) not null,
+  card_number text not null,
   card_name text not null,
   department text,
   current_balance numeric(12,2) not null default 0,
