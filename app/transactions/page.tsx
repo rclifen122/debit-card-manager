@@ -5,6 +5,7 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import { useToast } from '@/components/ToastProvider'
+import { useTranslation } from 'react-i18next'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 
 type Card = { id: string; card_name: string; card_number: string }
